@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FC 27 Team Randomizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0c1410;--panel:#13201a;--line:#24362c;--ink:#eef5f0;--mut:#8fa69a;--acc:#c6ff3d;--p1:#3fa9ff;--p2:#ff5a5a}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
+.wrap{max-width:1100px;margin:0 auto;padding:24px max(4vw,14px) 48px}
+h1{font:800 clamp(32px,5vw,48px)/1.05 "Barlow Condensed",sans-serif;margin:0 0 4px;letter-spacing:.5px}
+h1 b{color:var(--acc)}
+.sub{color:var(--mut);margin:0 0 20px;font-size:14px}
+.duel{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:16px;align-items:stretch}
+.card{background:linear-gradient(160deg,var(--panel),#0f1a15);border:1px solid var(--line);border-radius:18px;padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;overflow:hidden;min-height:340px}
+.card::before{content:"";position:absolute;inset:0 0 auto 0;height:5px;background:var(--pc)}
+.card.p1{--pc:var(--p1)}.card.p2{--pc:var(--p2)}
+.who{display:flex;gap:8px;align-items:center;width:100%;justify-content:space-between}
+.who input{background:transparent;border:1px solid transparent;color:var(--pc);font:800 22px "Barlow Condensed",sans-serif;width:100%;padding:4px 6px;border-radius:8px}
+.who input:focus{outline:none;border-color:var(--line)}
+.league{display:flex;align-items:center;gap:8px;margin-top:14px;color:var(--mut);font-size:14px;font-weight:600;min-height:32px}
+.league img,.league .mini{width:28px;height:28px;object-fit:contain;border-radius:4px}
+.crest{width:150px;height:150px;margin:14px 0 8px;display:grid;place-items:center}
+.crest img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 8px 18px rgba(0,0,0,.5))}
+.crest img.flag{width:150px;height:100px;object-fit:cover;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.badge{width:130px;height:130px;border-radius:50%;display:grid;place-items:center;font:800 42px "Barlow Condensed",sans-serif;color:#fff;border:4px solid rgba(255,255,255,.25)}
+.mini.badge{width:28px;height:28px;font-size:12px;border-width:2px}
+.team{font:800 clamp(26px,3.4vw,36px)/1.05 "Barlow Condensed",sans-serif;text-wrap:balance}
+.stars{color:#ffc93c;font-size:22px;letter-spacing:2px;margin-top:6px}
+.stars span{color:#3a4a41}
+.stars .h{font-style:normal;background:linear-gradient(90deg,#ffc93c 50%,#3a4a41 50%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.reroll{margin-top:auto;padding-top:14px}
+.vs{align-self:center;font:800 40px "Barlow Condensed",sans-serif;color:var(--acc)}
+.spin .crest,.spin .team{animation:sh .12s linear infinite}
+@keyframes sh{50%{transform:translateY(-3px);opacity:.75}}
+@media(prefers-reduced-motion:reduce){.spin .crest,.spin .team{animation:none}}
+button{font:600 15px Inter,sans-serif;border-radius:12px;border:1px solid var(--line);background:#1b2c23;color:var(--ink);padding:10px 16px;min-height:44px;cursor:pointer}
+button:hover{border-color:var(--acc)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.go{display:block;margin:18px auto 0;background:var(--acc);color:#0c1410;border:0;font:800 24px "Barlow Condensed",sans-serif;padding:12px 48px;letter-spacing:1px}
+.go:hover{filter:brightness(1.08)}
+.hint{text-align:center;color:var(--mut);font-size:13px;margin-top:8px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:24px}
+.panel h2{font:800 22px "Barlow Condensed",sans-serif;margin:0 0 12px}
+.row{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;margin-bottom:14px}
+label{font-size:14px;color:var(--mut);display:flex;gap:8px;align-items:center}
+select{font:16px Inter,sans-serif;background:#0f1a15;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-height:44px}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;border-radius:999px;font-size:14px;min-height:40px;opacity:.45}
+.chip.on{opacity:1;border-color:var(--acc)}
+.chip img,.chip .mini{width:22px;height:22px;object-fit:contain}
+.count{color:var(--mut);font-size:13px}
+.hist{list-style:none;padding:0;margin:0;font-size:14px}
+.hist li{padding:8px 0;border-top:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap}
+.hist li:first-child{border-top:0}
+.hist .a{color:var(--p1);font-weight:600}.hist .b{color:var(--p2);font-weight:600}
+.note{color:var(--mut);font-size:12px;margin-top:14px}
+@media(max-width:700px){.duel{grid-template-columns:minmax(0,1fr)}.vs{font-size:28px;text-align:center}.card{min-height:0}.crest{width:110px;height:110px}.crest img.flag{width:120px;height:80px}.badge{width:100px;height:100px;font-size:34px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>FC 27 <b>Team</b> Randomizer</h1>
+  <p class="sub">Hit “Spin” and each player gets a random team. Space bar works too.</p>
+
+  <div class="duel">
+    <div class="card p1" id="c0">
+      <div class="who"><input id="n0" value="Player 1" aria-label="Player 1 name"></div>
+      <div class="league" id="l0"></div>
+      <div class="crest" id="k0"></div>
+      <div class="team" id="t0">—</div>
+      <div class="stars" id="s0"></div>
+      <div class="reroll"><button data-re="0">↻ Re-roll</button></div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="card p2" id="c1">
+      <div class="who"><input id="n1" value="Player 2" aria-label="Player 2 name"></div>
+      <div class="league" id="l1"></div>
+      <div class="crest" id="k1"></div>
+      <div class="team" id="t1">—</div>
+      <div class="stars" id="s1"></div>
+      <div class="reroll"><button data-re="1">↻ Re-roll</button></div>
+    </div>
+  </div>
+  <button class="go" id="go">SPIN</button>
+  <div class="hint" id="pool"></div>
+
+  <div class="panel">
+    <h2>Settings</h2>
+    <div class="row">
+      <label>Stars from <select id="min"></select></label>
+      <label>to <select id="max"></select></label>
+      <label>Type <select id="type">
+        <option value="both">Clubs + national teams</option>
+        <option value="club">Clubs only</option>
+        <option value="nat">National teams only</option>
+      </select></label>
+    </div>
+    <div class="row">
+      <label><input type="checkbox" id="fair" checked> Fair mode: same star rating for both</label>
+      <label><input type="checkbox" id="diff" checked> No mirror match (different teams)</label>
+    </div>
+    <div class="row" style="justify-content:space-between;margin-bottom:8px">
+      <strong style="font-size:14px">Leagues</strong>
+      <span><button id="all">All</button> <button id="none">None</button></span>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="panel">
+    <h2>History</h2>
+    <ul class="hist" id="hist"><li class="count">Nothing yet</li></ul>
+  </div>
+  <p class="note">Star ratings are approximate: the 5★ and 4.5★ clubs follow the FC 27 launch ratings, the rest are estimates. Crests load from the internet; if one fails, a badge with initials is shown instead.</p>
+</div>
+
+<script>
+{
+const CR = id => id ? ["https://crests.football-data.org/"+id+".svg","https://crests.football-data.org/"+id+".png"] : [];
+const FLAG = c => "https://flagcdn.com/w160/"+c+".png";
+// league: [key, name, flag, emblem code, clubs: [name, football-data id, stars]]
+const LEAGUES = [
+ ["PL","Premier League","gb-eng","PL",[
+  ["Manchester City",65,5],["Arsenal",57,5],["Liverpool",64,5],["Chelsea",61,4.5],["Manchester United",66,4.5],["Tottenham Hotspur",73,4.5],["Aston Villa",58,4.5],["Newcastle United",67,4.5],
+  ["Brighton",397,4],["Nottingham Forest",351,4],["Crystal Palace",354,4],["West Ham",563,4],["Bournemouth",1044,4],["Brentford",402,4],["Fulham",63,4],["Everton",62,4],
+  ["Wolverhampton",76,3.5],["Leeds United",341,3.5],["Sunderland",71,3.5],["Burnley",328,3.5]]],
+ ["PD","LALIGA","es","PD",[
+  ["Real Madrid",86,5],["FC Barcelona",81,5],["Atlético Madrid",78,5],["Athletic Club",77,4],["Villarreal",94,4],["Real Betis",90,4],["Real Sociedad",92,4],
+  ["Sevilla",559,3.5],["Girona",298,3.5],["Valencia",95,3.5],["Celta Vigo",558,3.5],["Osasuna",79,3.5],["Mallorca",89,3.5],["Rayo Vallecano",87,3.5],["Getafe",82,3.5],["Espanyol",80,3.5],["Alavés",263,3]]],
+ ["BL1","Bundesliga","de","BL1",[
+  ["Bayern München",5,5],["Borussia Dortmund",4,4.5],["Bayer Leverkusen",3,4.5],["RB Leipzig",721,4],["Eintracht Frankfurt",19,4],["VfB Stuttgart",10,4],
+  ["VfL Wolfsburg",11,3.5],["Borussia M'gladbach",18,3.5],["SC Freiburg",17,3.5],["TSG Hoffenheim",2,3.5],["Werder Bremen",12,3.5],["Mainz 05",15,3.5],["Union Berlin",28,3.5],
+  ["FC Augsburg",16,3],["1. FC Köln",1,3],["Hamburger SV",7,3],["St. Pauli",20,3]]],
+ ["SA","Serie A","it","SA",[
+  ["Inter",108,4.5],["Napoli",113,4.5],["Juventus",109,4.5],["Roma",100,4.5],["Milan",98,4.5],["Atalanta",102,4],["Lazio",110,4],["Como",7397,4],["Bologna",103,4],["Fiorentina",99,4],
+  ["Torino",586,3.5],["Udinese",115,3.5],["Genoa",107,3.5],["Sassuolo",471,3.5],["Parma",112,3],["Cagliari",104,3],["Hellas Verona",450,3],["Lecce",5890,3]]],
+ ["FL1","Ligue 1","fr","FL1",[
+  ["Paris Saint-Germain",524,5],["Marseille",516,4],["Monaco",548,4],["Lyon",523,4],["Lille",521,4],
+  ["Nice",522,3.5],["Lens",546,3.5],["Rennes",529,3.5],["Strasbourg",576,3.5],["Nantes",543,3],["Toulouse",511,3],["Brest",512,3],["Paris FC",1045,3]]],
+ ["DED","Eredivisie","nl","DED",[["PSV",674,4],["Ajax",678,3.5],["Feyenoord",675,3.5],["AZ Alkmaar",682,3.5],["FC Twente",666,3]]],
+ ["PPL","Liga Portugal","pt","PPL",[["Benfica",1903,4],["Sporting CP",498,4],["FC Porto",503,4],["SC Braga",5613,3.5]]],
+ ["TSL","Süper Lig","tr",null,[["Galatasaray",610,4],["Fenerbahçe",611,4],["Beşiktaş",null,3.5]]],
+ ["SPL","Saudi Pro League","sa",null,[["Al Hilal",null,4],["Al Nassr",null,4],["Al Ittihad",null,4],["Al Ahli",null,4],["Al Qadsiah",null,3.5]]],
+ ["SCO","Scottish Premiership","gb-sct",null,[["Celtic",732,3.5],["Rangers",738,3]]],
+ ["MLS","MLS","us",null,[["Inter Miami",null,3.5],["LAFC",null,3.5],["LA Galaxy",null,3]]]
+];
+// national teams: [name, flag, stars]
+const NATS = [
+ ["France","fr",5],["England","gb-eng",5],["Spain","es",5],["Germany","de",4.5],["Portugal","pt",4.5],["Argentina","ar",4.5],["Brazil","br",4.5],["Netherlands","nl",4.5],
+ ["Italy","it",4],["Belgium","be",4],["Croatia","hr",4],["Uruguay","uy",4],["Norway","no",4],
+ ["USA","us",3.5],["Mexico","mx",3.5],["Colombia","co",3.5],["Denmark","dk",3.5],["Switzerland","ch",3.5],["Austria","at",3.5],["Türkiye","tr",3.5],["Poland","pl",3.5],["Ukraine","ua",3.5],["Sweden","se",3.5],["Scotland","gb-sct",3.5],
+ ["Czechia","cz",3],["Wales","gb-wls",3],["Rep. of Ireland","ie",3]
+];
+const ALL = [];
+LEAGUES.forEach(([key,lname,flag,emb,clubs]) => clubs.forEach(([n,id,s]) => ALL.push({n,s,lk:key,lname,lflag:flag,lemb:emb,srcs:CR(id),kind:"club"})));
+NATS.forEach(([n,f,s]) => ALL.push({n,s,lk:"NAT",lname:"National teams",lflag:null,lemb:null,srcs:[FLAG(f)],flag:true,kind:"nat"}));
+
+const $ = id => document.getElementById(id);
+const esc = t => String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const hue = t => {let h=0;for(const c of t)h=(h*31+c.charCodeAt(0))%360;return h};
+const initials = t => t.replace(/[^\p{L}\d ]/gu,"").split(" ").filter(w=>w.length>1||/\d/.test(w)).map(w=>w[0]).join("").slice(0,3).toUpperCase();
+const badge = (t,mini) => `<div class="badge${mini?" mini":""}" style="background:hsl(${hue(t)} 45% 32%)">${esc(initials(t)||"?")}</div>`;
+
+// image with fallback chain -> badge
+function img(srcs,label,cls,mini){
+  if(!srcs.length) return badge(label,mini);
+  const rest = esc(JSON.stringify(srcs.slice(1)));
+  return `<img class="${cls||""}" src="${esc(srcs[0])}" data-rest="${rest}" data-label="${esc(label)}" data-mini="${mini?1:""}" alt="${esc(label)}" loading="eager">`;
+}
+document.addEventListener("error", e => {
+  const el = e.target; if(el.tagName!=="IMG"||!el.dataset.label) return;
+  const rest = JSON.parse(el.dataset.rest||"[]");
+  if(rest.length){el.dataset.rest=JSON.stringify(rest.slice(1));el.src=rest[0];}
+  else el.outerHTML = badge(el.dataset.label, !!el.dataset.mini);
+}, true);
+const leagueIcon = (t,mini) => t.lemb ? img(["https://crests.football-data.org/"+t.lemb+".png"].concat(t.lflag?[FLAG(t.lflag)]:[]),t.lname,"",mini)
+  : t.lflag ? img([FLAG(t.lflag)],t.lname,"",mini) : `<span class="mini" style="font-size:20px;line-height:28px">🌍</span>`;
+const starStr = s => "★".repeat(Math.floor(s)) + (s%1?'<i class="h">★</i>':"") + `<span>${"★".repeat(5-Math.ceil(s))}</span>`;
+
+// settings
+const STEPS=[3,3.5,4,4.5,5];
+for(const id of ["min","max"]) $(id).innerHTML = STEPS.map(s=>`<option value="${s}">${s}★</option>`).join("");
+let st = {min:3,max:5,type:"both",fair:true,diff:true,off:[],n0:"Player 1",n1:"Player 2",hist:[]};
+try{Object.assign(st, JSON.parse(localStorage.getItem("fc27rnd_en")||"{}"))}catch(e){}
+const save = () => {try{localStorage.setItem("fc27rnd_en",JSON.stringify(st))}catch(e){}};
+$("min").value=st.min;$("max").value=st.max;$("type").value=st.type;$("fair").checked=st.fair;$("diff").checked=st.diff;$("n0").value=st.n0;$("n1").value=st.n1;
+
+const chipList = LEAGUES.map(l=>({k:l[0],name:l[1],icon:leagueIcon({lname:l[1],lflag:l[2],lemb:l[3]},true)})).concat([{k:"NAT",name:"National teams",icon:`<span class="mini" style="font-size:18px">🌍</span>`}]);
+function drawChips(){
+  $("chips").innerHTML = chipList.map(c=>`<button class="chip${st.off.includes(c.k)?"":" on"}" data-k="${c.k}" aria-pressed="${!st.off.includes(c.k)}">${c.icon}${esc(c.name)}</button>`).join("");
+}
+function pool(){
+  const lo=Math.min(st.min,st.max), hi=Math.max(st.min,st.max);
+  return ALL.filter(t=>t.s>=3 && t.s>=lo && t.s<=hi && !st.off.includes(t.lk) && (st.type==="both"||t.kind===st.type));
+}
+function updPool(){const p=pool();$("pool").textContent = p.length ? `${p.length} teams in the pool` : "Pool is empty — change the settings";}
+
+const cur=[null,null];
+const rnd = a => a[Math.floor(Math.random()*a.length)];
+function show(i,t){
+  $("l"+i).innerHTML = t.kind==="nat" ? `<span style="font-size:20px">🌍</span> National team` : leagueIcon(t,true)+" "+esc(t.lname);
+  $("k"+i).innerHTML = img(t.srcs,t.n,t.flag?"flag":"");
+  $("t"+i).textContent = t.n;
+  $("s"+i).innerHTML = starStr(t.s);
+}
+function pick(i){
+  let p = pool(); if(!p.length) return null;
+  const other = cur[1-i];
+  if(st.diff && other) p = p.filter(t=>t!==other);
+  if(st.fair && other){const same=p.filter(t=>t.s===other.s); if(same.length) p=same;}
+  return p.length ? rnd(p) : null;
+}
+let busy=false;
+function roll(which){
+  if(busy) return; const p=pool(); if(!p.length){updPool();return;}
+  busy=true;
+  const idx = which==null?[0,1]:[which];
+  if(which==null){ // choose both fresh
+    let a=rnd(p), pb=p.filter(t=>!st.diff||t!==a);
+    if(st.fair){const same=pb.filter(t=>t.s===a.s); if(same.length) pb=same;}
+    cur[0]=a; cur[1]=pb.length?rnd(pb):a;
+  } else { const t=pick(which); if(t) cur[which]=t; }
+  idx.forEach(i=>$("c"+i).classList.add("spin"));
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let n=0; const total=reduce?1:14;
+  const tick=()=>{
+    n++;
+    if(n<total){ idx.forEach(i=>{$("t"+i).textContent=rnd(p).n}); setTimeout(tick,40+n*8); }
+    else { idx.forEach(i=>{$("c"+i).classList.remove("spin");show(i,cur[i])}); busy=false; addHist(); }
+  };
+  tick();
+}
+function addHist(){
+  if(!cur[0]||!cur[1]) return;
+  st.hist.unshift({a:cur[0].n,as:cur[0].s,b:cur[1].n,bs:cur[1].s,t:new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})});
+  st.hist=st.hist.slice(0,10); save(); drawHist();
+}
+function drawHist(){
+  $("hist").innerHTML = st.hist.length ? st.hist.map(h=>`<li><span class="count">${esc(h.t)}</span><span class="a">${esc(st.n0)}: ${esc(h.a)} (${h.as}★)</span><span>vs</span><span class="b">${esc(st.n1)}: ${esc(h.b)} (${h.bs}★)</span></li>`).join("") : `<li class="count">Nothing yet</li>`;
+}
+
+$("go").addEventListener("click",()=>roll());
+document.querySelectorAll("[data-re]").forEach(b=>b.addEventListener("click",()=>roll(+b.dataset.re)));
+document.addEventListener("keydown",e=>{if(e.code==="Space"&&!["INPUT","SELECT","BUTTON"].includes(e.target.tagName)){e.preventDefault();roll();}});
+for(const id of ["min","max","type"]) $(id).addEventListener("change",e=>{st[id]=id==="type"?e.target.value:+e.target.value;save();updPool();});
+for(const id of ["fair","diff"]) $(id).addEventListener("change",e=>{st[id]=e.target.checked;save();});
+for(const id of ["n0","n1"]) $(id).addEventListener("input",e=>{st[id]=e.target.value;save();drawHist();});
+$("chips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;const k=b.dataset.k;st.off=st.off.includes(k)?st.off.filter(x=>x!==k):st.off.concat(k);save();drawChips();updPool();});
+$("all").addEventListener("click",()=>{st.off=[];save();drawChips();updPool();});
+$("none").addEventListener("click",()=>{st.off=chipList.map(c=>c.k);save();drawChips();updPool();});
+
+drawChips();updPool();drawHist();
+}
+</script>
+</body>
+</html>
